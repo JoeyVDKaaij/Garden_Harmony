@@ -10,7 +10,6 @@ public class ActionCounterUpdaterScript : MonoBehaviour
     [SerializeField, Tooltip("Set to true if this should count the days survived.")]
     private bool daysSurvivedText = false;
     
-    private int daysSurvivedCounter;
 
     private void Awake()
     {
@@ -26,7 +25,7 @@ public class ActionCounterUpdaterScript : MonoBehaviour
             if (!daysSurvivedText)
                 _text.SetText("Actions left: " + GameManager._instance.ActionsLeft);
             else 
-                _text.SetText("Days survived: " + daysSurvivedCounter);
+                _text.SetText("Days survived: " + GameManager._instance.DaysSurvived);
         }
     }
 
@@ -37,8 +36,8 @@ public class ActionCounterUpdaterScript : MonoBehaviour
         if (!daysSurvivedText) _text.SetText("Actions left: " + pActionsLeft);
         else if (pActionsLeft == 0)
         {
-            daysSurvivedCounter++;
-            _text.SetText("Days survived: " + daysSurvivedCounter);
+            GameManager._instance.UpdateDay();
+            _text.SetText("Days survived: " + GameManager._instance.DaysSurvived);
         }
     }
 }

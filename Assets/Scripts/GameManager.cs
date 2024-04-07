@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     public static event Action<int> ActivatedAction;
 
     private int _actionsLeft;
+    private int _daysSurvivedCounter;
 
     private bool _currentlyInAction = false;
     private DamageType _actionType = DamageType.None;
@@ -108,9 +109,27 @@ public class GameManager : MonoBehaviour
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
 
+    public void UpdateDay()
+    {
+        _daysSurvivedCounter++;
+    }
+
+    public void ResetValues()
+    {
+        _actionsLeft = maxAmountOfActions;
+        _daysSurvivedCounter = 0;
+        _currentlyInAction = false;
+        _actionType = DamageType.None;
+    }
+    
     public int ActionsLeft
     {
         get { return _actionsLeft; }
+    }
+
+    public int DaysSurvived
+    {
+        get { return _daysSurvivedCounter; }
     }
     
     public bool CurrentlyInAction

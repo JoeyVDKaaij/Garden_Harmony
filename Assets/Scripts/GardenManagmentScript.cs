@@ -84,4 +84,12 @@ public class GardenManagmentScript : MonoBehaviour
             _affectedPlants.Remove(pPlant);
         }
     }
+
+    private void Update()
+    {
+        if (transform.childCount <= 0)
+        {
+            // Quit
+        }
+    }
 }
