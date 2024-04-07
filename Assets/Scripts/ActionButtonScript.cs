@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +7,7 @@ public class ActionButtonScript : MonoBehaviour
 {
     [Header("Action Settings")]
     [SerializeField, Tooltip("Set the action that this button performs.")]
-    private Actions action = Actions.Spray;
+    private DamageType action = DamageType.Bug;
     
     private Button _button;
     
@@ -21,22 +22,19 @@ public class ActionButtonScript : MonoBehaviour
 
     public void ActivateAction()
     {
-        GameManager._instance.ActivatedActionEvent();
-        
-        Debug.Log(action);
+        if (action == DamageType.None)
+            GameManager._instance.ActivatedActionEvent();
+        else
+            GameManager._instance.enableActionClicker(action);
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(1)) GameManager._instance.disableActionClicker();
     }
 
     private void CheckActionsLeft(int pActionsLeft)
     {
         _button.interactable = pActionsLeft > 0;
     }
-}
-
-public enum Actions
-{
-    Spray,
-    Soil,
-    Water,
-    Weed,
-    PowerUp
 }
