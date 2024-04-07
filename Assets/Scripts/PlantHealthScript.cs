@@ -42,11 +42,16 @@ public class PlantHealthScript : MonoBehaviour
     [SerializeField, Tooltip("Which damage state the plant is currently in.")]
     private DamageType damageType = DamageType.None;
 
+    private GardenManagmentScript _gardenManagmentScript;
+
     private int _nightCyclesUntilDeath;
+
+    private bool delay;
 
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
+        _gardenManagmentScript = transform.parent.GetComponent<GardenManagmentScript>();
         _nightCyclesUntilDeath = maxNightCyclesUntilDeath;
     }
 
@@ -63,7 +68,7 @@ public class PlantHealthScript : MonoBehaviour
 
             if (plantSprites != null)
             {
-                _plantSpriteId = Random.Range(0, plantSprites.Length - 1);
+                _plantSpriteId = Random.Range(0, plantSprites.Length);
                 if (plantSprites[_plantSpriteId].normal != null)
                     sr.sprite = plantSprites[_plantSpriteId].normal;
             }
@@ -74,25 +79,29 @@ public class PlantHealthScript : MonoBehaviour
     {
         int damageTypeId = Random.Range(1, Enum.GetValues(typeof(DamageType)).Length);
         damageType = (DamageType)damageTypeId;
+        Debug.Log("test");
         if (plantSprites != null && plantSprites.Length != 0)
         { 
             if (plantSprites[_plantSpriteId].CheckValues())
             {
-                switch (damageTypeId)
+                Debug.Log(damageType);
+                switch (damageType)
                 {
-                    case 1:
+                    case DamageType.Bug:
                         sr.sprite = plantSprites[_plantSpriteId].bugsEating;
                         break;
-                    case 2:
+                    case DamageType.Weed:
                         sr.sprite = plantSprites[_plantSpriteId].weed;
                         break;
-                    case 3:
+                    case DamageType.Thirsty:
                         sr.sprite = plantSprites[_plantSpriteId].thirsty;
                         break;
-                    case 4:
+                    case DamageType.Eaten:
                         sr.sprite = plantSprites[_plantSpriteId].eaten;
                         break;
                 }
+
+                delay = true;
             }
         }
     }
@@ -101,8 +110,17 @@ public class PlantHealthScript : MonoBehaviour
     {
         if (_nightCyclesUntilDeath <= 0)
         {
-            Destroy(gameObject);
+            _gardenManagmentScript.RemovePlantFromList(gameObject, true);
         }
+
+        if (Input.GetMouseButtonDown(0) && GameManager._instance.ActionType == damageType && damageType != DamageType.None)
+        {
+            FixPlant();
+            GameManager._instance.disableActionClicker();
+            GameManager._instance.ActivatedActionEvent();
+        }
+
+        delay = false;
     }
 
     public void DamagePlant()
@@ -118,6 +136,9 @@ public class PlantHealthScript : MonoBehaviour
             if (plantSprites[_plantSpriteId].normal != null)
                 sr.sprite = plantSprites[_plantSpriteId].normal;
         }
+
+        damageType = DamageType.None;
+        _gardenManagmentScript.ToggleBetweenLists(gameObject);
     }
 }
 

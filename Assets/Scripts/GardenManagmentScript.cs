@@ -28,22 +28,60 @@ public class GardenManagmentScript : MonoBehaviour
 
         for (int i = 0; i < plantsAffected; i++)
         {
-            int affectedPlant = Random.Range(0, transform.childCount-1);
-            if (_noEffectPlants.Count != 0)
+            if (_noEffectPlants.Count > 0)
             {
-                while (transform.GetChild(affectedPlant).gameObject != _noEffectPlants[affectedPlant])
-                {
-                    affectedPlant = Random.Range(0, transform.childCount-1);
-                }
+                int affectedPlant = Random.Range(0, _noEffectPlants.Count);
+                _noEffectPlants[affectedPlant].GetComponent<PlantHealthScript>().StartDamagingPlant();
+                _affectedPlants.Add(_noEffectPlants[affectedPlant]);
+                _noEffectPlants.Remove(_noEffectPlants[affectedPlant]);
             }
-            transform.GetChild(affectedPlant).GetComponent<PlantHealthScript>().StartDamagingPlant();
-            _noEffectPlants.Remove(transform.GetChild(affectedPlant).gameObject);
-            _affectedPlants.Add(transform.GetChild(affectedPlant).gameObject);
         }
 
-        foreach (GameObject affectedPlant in _affectedPlants)
+        for (int i = _affectedPlants.Count-1; i > -1; --i)
         {
-            affectedPlant.GetComponent<PlantHealthScript>().DamagePlant();
+            if (_affectedPlants[i] != null)
+            {
+                _affectedPlants[i].GetComponent<PlantHealthScript>().DamagePlant();
+            }
+            else _affectedPlants.Remove(_affectedPlants[i]);
         }
     }
-}//
+
+    public void RemovePlantFromList(GameObject pPlant, bool affected)
+    {
+        if (pPlant != null)
+        {
+            if (affected) _affectedPlants.Remove(pPlant);
+            else _noEffectPlants.Remove(pPlant);
+            Destroy(pPlant);
+        }
+    }
+
+    public void ToggleBetweenLists(GameObject pPlant)
+    {
+        if (_noEffectPlants.Count <= 0)
+        {
+            bool objectSpotted = false;
+            foreach (GameObject obj in _noEffectPlants)
+            {
+                if (obj == pPlant) objectSpotted = true;
+            }
+
+            if (objectSpotted)
+            {
+                _noEffectPlants.Remove(pPlant);
+                _affectedPlants.Add(pPlant);
+            }
+            else
+            {
+                _noEffectPlants.Add(pPlant);
+                _affectedPlants.Remove(pPlant);
+            }
+        }
+        else
+        {
+            _noEffectPlants.Add(pPlant);
+            _affectedPlants.Remove(pPlant);
+        }
+    }
+}
