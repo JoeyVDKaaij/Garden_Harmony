@@ -16,6 +16,11 @@ public class GameManager : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField, Tooltip("Set how fast the game goes."), Min(0)]
     private float gameSpeed = 1f;
+    [Tooltip("Set to false if the gameplay settings should be set using what is set in the GameManager instead of from the difficulty scriptable objects."), Min(0)]
+    public bool setValuesUsingDifficulties = true;
+    [SerializeField, Tooltip("Set how fast the game goes."), Min(1)]
+    private int neededPlantsSavedStreak = 10;
+    
     
     [Header("Actions Settings")]
     [SerializeField, Tooltip("Set how fast the game goes."), Min(0)]
@@ -25,6 +30,9 @@ public class GameManager : MonoBehaviour
     
     private float _fixedDeltaTime;
 
+    [HideInInspector]
+    public DifficultyScriptableObject difficulty;
+
     public static event Action<int> ActivatedAction;
 
     private int _actionsLeft;
@@ -32,6 +40,12 @@ public class GameManager : MonoBehaviour
 
     private bool _currentlyInAction = false;
     private DamageType _actionType = DamageType.None;
+    
+    private int _currentPlantsSavedStreak = 0;
+    private bool _savedPlantsEnding = false;
+
+    [HideInInspector]
+    public bool endless = false;
     
     private void Awake()
     {
@@ -71,9 +85,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ActivatedActionEvent()
+    public void ActivatedActionEvent(DamageType pDamageType)
     {
-        _actionsLeft--;
+        if (pDamageType != DamageType.None)
+            _actionsLeft--;
+        else
+            _actionsLeft = 0;
         ActivatedAction?.Invoke(_actionsLeft);
     }
 
@@ -83,7 +100,7 @@ public class GameManager : MonoBehaviour
         ActivatedAction?.Invoke(_actionsLeft);
     }
 
-    public void enableActionClicker(DamageType pdamageType)
+    public void EnableActionClicker(DamageType pdamageType)
     {
         _actionType = pdamageType;
         switch (_actionType)
@@ -103,7 +120,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void disableActionClicker()
+    public void DisableActionClicker()
     {
         _actionType = DamageType.None;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
@@ -112,14 +129,35 @@ public class GameManager : MonoBehaviour
     public void UpdateDay()
     {
         _daysSurvivedCounter++;
+        _currentPlantsSavedStreak++;
+        if (_currentPlantsSavedStreak >= neededPlantsSavedStreak && !endless)
+        {
+            _savedPlantsEnding = true;
+            SceneSwitch._instance.scene_changer(3);
+        }
     }
 
     public void ResetValues()
     {
-        _actionsLeft = maxAmountOfActions;
-        _daysSurvivedCounter = 0;
+        if (setValuesUsingDifficulties && difficulty != null)
+        {
+            _actionsLeft = difficulty.maxAmountOfMoves;
+            neededPlantsSavedStreak = difficulty.neededPlantsSavedStreak;
+        }
+        else
+        {
+            _actionsLeft = maxAmountOfActions;
+        }
         _currentlyInAction = false;
+        _currentPlantsSavedStreak = 0;
+        _savedPlantsEnding = false;
         _actionType = DamageType.None;
+        _daysSurvivedCounter = 0;
+    }
+
+    public void ResetPlantsSavedStreak()
+    {
+        _currentPlantsSavedStreak = 0;
     }
     
     public int ActionsLeft
@@ -140,5 +178,10 @@ public class GameManager : MonoBehaviour
     public DamageType ActionType
     {
         get { return _actionType; }
+    }
+
+    public bool SavedPlantsEnding
+    {
+        get { return _savedPlantsEnding; }
     }
 }

@@ -13,12 +13,25 @@ public class GardenManagmentScript : MonoBehaviour
     private int affectedPlantMinimum;
     [SerializeField, Tooltip("Set how many plants get affected with affects each night max."), Min(1)]
     private int affectedPlantLimit = 3;
+    [SerializeField, Tooltip("Set how many plants should be alive before the game ends."), Min(0)]
+    private int minimumPlantCount = 0;
+    
     
     private void Awake()
     {
         for (int i = 0; i < transform.childCount; i++)
         {
             _noEffectPlants.Add(transform.GetChild(i).gameObject);
+        }
+
+        if (GameManager._instance.setValuesUsingDifficulties && GameManager._instance.difficulty != null)
+        {
+            affectedPlantMinimum = GameManager._instance.difficulty.affectedPlantMinimum;
+            if (GameManager._instance.difficulty.affectedPlantLimit <= affectedPlantMinimum)
+                affectedPlantLimit = affectedPlantMinimum + 1;
+            else
+                affectedPlantLimit = GameManager._instance.difficulty.affectedPlantLimit;
+            minimumPlantCount = GameManager._instance.difficulty.minimumPlantCount;
         }
     }
 
@@ -54,6 +67,7 @@ public class GardenManagmentScript : MonoBehaviour
             if (affected) _affectedPlants.Remove(pPlant);
             else _noEffectPlants.Remove(pPlant);
             Destroy(pPlant);
+            GameManager._instance.ResetPlantsSavedStreak();
         }
     }
 
@@ -87,9 +101,9 @@ public class GardenManagmentScript : MonoBehaviour
 
     private void Update()
     {
-        if (transform.childCount <= 0)
+        if (transform.childCount <= minimumPlantCount)
         {
-            // Quit
+            SceneSwitch._instance.scene_changer(3);
         }
     }
 }

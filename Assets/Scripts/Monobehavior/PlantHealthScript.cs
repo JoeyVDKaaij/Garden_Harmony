@@ -52,6 +52,8 @@ public class PlantHealthScript : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         _gardenManagmentScript = transform.parent.GetComponent<GardenManagmentScript>();
+        if (GameManager._instance.setValuesUsingDifficulties && GameManager._instance.difficulty != null)
+            maxNightCyclesUntilDeath = GameManager._instance.difficulty.maxNightCyclesUntilDeath;
         _nightCyclesUntilDeath = maxNightCyclesUntilDeath;
     }
 
@@ -113,13 +115,17 @@ public class PlantHealthScript : MonoBehaviour
             _gardenManagmentScript.RemovePlantFromList(gameObject, true);
         }
 
-        if (Input.GetMouseButtonDown(0) && GameManager._instance.ActionType == damageType && damageType != DamageType.None)
+    }
+
+    private void OnMouseDown()
+    {
+
+        if (GameManager._instance.ActionType == damageType && damageType != DamageType.None)
         {
             FixPlant();
-            GameManager._instance.disableActionClicker();
-            GameManager._instance.ActivatedActionEvent();
+            GameManager._instance.DisableActionClicker();
+            GameManager._instance.ActivatedActionEvent(DamageType.Bug);
         }
-
         delay = false;
     }
 

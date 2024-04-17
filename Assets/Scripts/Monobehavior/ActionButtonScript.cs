@@ -23,14 +23,14 @@ public class ActionButtonScript : MonoBehaviour
     public void ActivateAction()
     {
         if (action == DamageType.None)
-            GameManager._instance.ActivatedActionEvent();
+            GameManager._instance.ActivatedActionEvent(action);
         else
-            GameManager._instance.enableActionClicker(action);
+            GameManager._instance.EnableActionClicker(action);
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(1)) GameManager._instance.disableActionClicker();
+        if (Input.GetMouseButtonDown(1)) GameManager._instance.DisableActionClicker();
     }
 
     private void CheckActionsLeft(int pActionsLeft)
