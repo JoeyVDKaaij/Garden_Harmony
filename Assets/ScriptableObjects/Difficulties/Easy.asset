@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8641c2ffa1c5d44913222139ba82ec, type: 3}
+  m_Name: Easy
+  m_EditorClassIdentifier: 
+  description: Get 3 moves a day. 1 to 3 plants get affected each night. They survive
+    for 3 days and having 3 or less plants left results in a game over. Win by not
+    letting any plants die for 5 days in a row.
+  maxAmountOfMoves: 3
+  neededPlantsSavedStreak: 5
+  affectedPlantMinimum: 1
+  affectedPlantLimit: 4
+  maxNightCyclesUntilDeath: 4
+  minimumPlantCount: 3
